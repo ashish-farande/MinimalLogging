@@ -15,8 +15,10 @@
 
 const std::string SOURCE_ROOT_DIR {SOURCE_ROOT};
 const std::string META_DATA_DAT_FILE_PATH {SOURCE_ROOT_DIR + "/output/metadata.dat"};
-const std::string META_DATA_TXT_FILE_PATH {SOURCE_ROOT_DIR+ "/output/metadata.txt"};
-const std::string TMP_LOG_FILE_PATH {SOURCE_ROOT_DIR + "/output/log.dat"};
+const std::string READ_LOG_FILE_PATH {SOURCE_ROOT_DIR + "/output/log.txt"};
+
+// FIXME: This is a temporary file for human readable format. Should be removed when the project is complete.
+const std::string TMP_META_DATA_TXT_FILE_PATH {SOURCE_ROOT_DIR+ "/output/metadata.txt"};
 
 template <typename T>
 void writeToFile(std::ofstream &file, const T &arg)
@@ -41,7 +43,7 @@ struct MetaDataSaver
         // This is temporary for human readable format
         int log_lines = 0;
         
-        std::ofstream file(META_DATA_TXT_FILE_PATH.c_str());
+        std::ofstream file(TMP_META_DATA_TXT_FILE_PATH.c_str());
 
         auto &temp = head_node();
         while (temp != nullptr)
@@ -121,7 +123,8 @@ struct MetaDataReader
         std::cout << meta_data.size();
     }
 
-    void read(const std::string &file_name = TMP_LOG_FILE_PATH)
+    // FIXME: Read and wrtite should be in binary format to save space
+    void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
         std::ifstream log_file(file_name, std::ios::in);
 
@@ -140,7 +143,6 @@ struct MetaDataReader
             std::cout << meta_data.at(id).macroData.file << meta_data.at(id).macroData.function << meta_data.at(id).macroData.line;
 
             for( std::size_t i = 0; i<meta_data.at(id).desciprtors.size(); i++)
-            // for (const auto &desc : meta_data.at(id).desciprtors)
             {
                 TypeDescriptor desc = meta_data.at(id).desciprtors.at(i);
                 // TODO: Update this to all the data types
