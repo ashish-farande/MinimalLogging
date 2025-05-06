@@ -32,8 +32,8 @@ template <class F, class... Args>
 void log(Args const &...args)
 {
     // TODO: Writing to the file should be handled using RingBuffers
-    std::ofstream file_out("log.txt", std::ios::app);
-    file_out << meta_data_node<F, Args...>.id << " ";
+    std::ofstream file_out((std::string(SOURCE_ROOT) + "/output/log.dat").c_str(), std::ios::app | std::ios::binary);
+    file_out << meta_data_node<F, Args...>.id;
     writeToFile(file_out, args...);
     file_out << "\n";
     file_out.close();

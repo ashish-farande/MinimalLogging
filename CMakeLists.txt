@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10...3.27)
 
 set(CMAKE_C_COMPILER /opt/homebrew/bin/gcc)
 set(CMAKE_CXX_COMPILER /opt/homebrew/bin/g++)
@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(PROJECT_SOURCE_DIR ./src)
 
+add_compile_definitions( SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
 
 
 include_directories("/usr/include/opencv4/")

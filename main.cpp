@@ -3,6 +3,7 @@
 
 #include "src/logger.h"
 
+const std::string meta_data_file_name = std::string(SOURCE_ROOT) + "output/metadata.dat";
 void test_logger()
 {
     LOG_WARN("This is an Warning {{}} {{}}", 1, 2);
@@ -14,9 +15,13 @@ void test_logger()
 int main() {
 
     // Find a way to save this file before the main.
-    MetaDataSaver init;
+    MetaDataSaver metadata_saver(meta_data_file_name);
+
 
     std::cout<<"Entering Main\n";
     test_logger();
+
+    MetaDataReader metadata_reader(meta_data_file_name);
+    metadata_reader.read();
     return 0;
 }
