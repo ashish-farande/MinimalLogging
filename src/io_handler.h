@@ -6,11 +6,17 @@
 #include <iostream>
 #include <variant>
 #include <unordered_map>
+#include <string>
 
 #include "meta_data/meta_data.h"
 #include "meta_data/meta_data_node.h"
 #include "meta_data/type_descriptors.h"
 #include "utils.h"
+
+const std::string SOURCE_ROOT_DIR {SOURCE_ROOT};
+const std::string META_DATA_DAT_FILE_PATH {SOURCE_ROOT_DIR + "/output/metadata.dat"};
+const std::string META_DATA_TXT_FILE_PATH {SOURCE_ROOT_DIR+ "/output/metadata.txt"};
+const std::string TMP_LOG_FILE_PATH {SOURCE_ROOT_DIR + "/output/log.dat"};
 
 template <typename T>
 void writeToFile(std::ofstream &file, const T &arg)
@@ -27,7 +33,7 @@ void writeToFile(std::ofstream &file, const T &arg, const Args &...args)
 
 struct MetaDataSaver
 {
-    MetaDataSaver(const std::string &file_name)
+    MetaDataSaver(const std::string &file_name = META_DATA_DAT_FILE_PATH)
     {
         std::ofstream bin_file(file_name, std::ios::binary);
 
@@ -35,7 +41,7 @@ struct MetaDataSaver
         // This is temporary for human readable format
         int log_lines = 0;
         
-        std::ofstream file((std::string(SOURCE_ROOT) + "/output/metadata.txt").c_str());
+        std::ofstream file(META_DATA_TXT_FILE_PATH.c_str());
 
         auto &temp = head_node();
         while (temp != nullptr)
@@ -85,7 +91,7 @@ struct MetaDataReader
 {
     std::unordered_map<int64_t, MetaDataWithDescriptors> meta_data;
 
-    MetaDataReader(const std::string &file_name)
+    MetaDataReader(const std::string &file_name = META_DATA_DAT_FILE_PATH)
     {
         std::ifstream meta_data_file(file_name, std::ios::in | std::ios::binary);
 
@@ -115,7 +121,7 @@ struct MetaDataReader
         std::cout << meta_data.size();
     }
 
-    void read(const std::string &file_name = "log.dat")
+    void read(const std::string &file_name = TMP_LOG_FILE_PATH)
     {
         std::ifstream log_file(file_name, std::ios::in);
 
