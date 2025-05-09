@@ -7,23 +7,29 @@
 #include <variant>
 #include <unordered_map>
 #include <string>
+#include <cstdio>
+#include <format>
+#include <typeinfo>
 
 #include "meta_data/meta_data.h"
 #include "meta_data/meta_data_node.h"
 #include "meta_data/type_descriptors.h"
 #include "utils.h"
 
-const std::string SOURCE_ROOT_DIR {SOURCE_ROOT};
-const std::string META_DATA_DAT_FILE_PATH {SOURCE_ROOT_DIR + "/output/metadata.dat"};
-const std::string READ_LOG_FILE_PATH {SOURCE_ROOT_DIR + "/output/log.txt"};
+const std::string SOURCE_ROOT_DIR{SOURCE_ROOT};
+const std::string META_DATA_DAT_FILE_PATH{SOURCE_ROOT_DIR + "/output/metadata.dat"};
+const std::string READ_LOG_FILE_PATH{SOURCE_ROOT_DIR + "/output/log.dat"};
 
 // FIXME: This is a temporary file for human readable format. Should be removed when the project is complete.
-const std::string TMP_META_DATA_TXT_FILE_PATH {SOURCE_ROOT_DIR+ "/output/metadata.txt"};
+const std::string TMP_META_DATA_TXT_FILE_PATH{SOURCE_ROOT_DIR + "/output/metadata.txt"};
 
 template <typename T>
 void writeToFile(std::ofstream &file, const T &arg)
 {
-    file << arg;
+    std::cout << typeid(arg).name() << "\n";
+    std::cout << sizeof(decltype(arg)) << "\n";
+
+    file.write(reinterpret_cast<const char *>(&arg), sizeof(decltype(arg)));
 }
 
 template <typename T, typename... Args>
@@ -42,7 +48,7 @@ struct MetaDataSaver
         // TODO: Remove when project is complete
         // This is temporary for human readable format
         int log_lines = 0;
-        
+
         std::ofstream file(TMP_META_DATA_TXT_FILE_PATH.c_str());
 
         auto &temp = head_node();
@@ -120,10 +126,10 @@ struct MetaDataReader
             meta_data.insert({id, MetaDataWithDescriptors{macro_data, Span{tds}}});
         }
 
-        std::cout << meta_data.size();
+        std::cout << "Metadata size: " << meta_data.size() << "\n";
     }
 
-    // FIXME: Read and wrtite should be in binary format to save space
+    // FIXME: Reading of the log file is not working
     void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
         std::ifstream log_file(file_name, std::ios::in);
@@ -133,16 +139,18 @@ struct MetaDataReader
 
         while (!log_file.eof())
         {
-            int64_t id;
+            std::cout << "\n";
+            int64_t id = 0;
             log_file.read(reinterpret_cast<char *>(&id), sizeof(decltype(id)));
 
             if (meta_data.find(id) == meta_data.end())
                 continue;
 
+            std::cout << id << " " << meta_data.at(id).macroData.file << " " << meta_data.at(id).macroData.function << " " << meta_data.at(id).macroData.line << "\n";
 
-            std::cout << meta_data.at(id).macroData.file << meta_data.at(id).macroData.function << meta_data.at(id).macroData.line;
+            std::cout << meta_data.at(id).macroData.fmt_str << "\n";
 
-            for( std::size_t i = 0; i<meta_data.at(id).desciprtors.size(); i++)
+            for (std::size_t i = 0; i < meta_data.at(id).desciprtors.size(); i++)
             {
                 TypeDescriptor desc = meta_data.at(id).desciprtors.at(i);
                 // TODO: Update this to all the data types
@@ -150,13 +158,13 @@ struct MetaDataReader
                 {
                     int val;
                     log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                    std::cout << val;
+                    std::cout << val << " ";
                 }
                 else if (std::get_if<Float>(&desc))
                 {
                     float val;
                     log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                    std::cout << val;
+                    std::cout << val << " ";
                 }
                 else if (std::get_if<CStr>(&desc))
                 {
@@ -165,6 +173,23 @@ struct MetaDataReader
                     // s += std::to_string(val);
                 }
             }
+            std::cout << "\n";
+
+            // FIXME: Format the read data
+            // int a = 1, b = 2;
+            // std::string formatted = std::vformat(meta_data.at(id).macroData.fmt_str, std::make_format_args(a, b));
+            // std::cout << formatted;
+        }
+
+        // FIXME: This is a temporary. Should be removed when the project is complete.
+        // Attempt to delete the file
+        if (std::remove(file_name.c_str()) == 0)
+        {
+            std::cout << "File '" << file_name << "' deleted successfully." << std::endl;
+        }
+        else
+        {
+            std::cerr << "Error deleting file '" << file_name << "'." << std::endl;
         }
     }
 };

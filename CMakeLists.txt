@@ -9,8 +9,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 set(PROJECT_SOURCE_DIR ./src)
 
-add_compile_definitions( SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
-
+add_compile_definitions(SOURCE_ROOT="${CMAKE_SOURCE_DIR}")
 
 include_directories("/usr/include/opencv4/")
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -25,6 +24,5 @@ file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/*.cpp ${PROJECT_SOURCE_DIR}/*.
 add_executable(minimal_logging ../main.cpp)
 
 target_include_directories(minimal_logging PUBLIC ${PROJECT_SOURCE_DIR}/src)
+
 # target_link_libraries(minimal_logging )
-
-

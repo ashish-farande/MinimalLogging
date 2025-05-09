@@ -13,7 +13,7 @@ enum class Level
 
 int64_t gen_id()
 {
-    static int64_t id{-1};
+    static int64_t id{0};
     ++id;
     return id;
 }

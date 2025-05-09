@@ -33,9 +33,8 @@ void log(Args const &...args)
 {
     // TODO: Writing to the file should be handled using RingBuffers
     std::ofstream file_out(READ_LOG_FILE_PATH.c_str(), std::ios::app | std::ios::binary);
-    file_out << meta_data_node<F, Args...>.id;
+    file_out.write(reinterpret_cast<const char *>(&meta_data_node<F, Args...>.id), sizeof(decltype(meta_data_node<F, Args...>.id)));
     writeToFile(file_out, args...);
-    file_out << "\n";
     file_out.close();
 }
 #endif /* AB9C9A9D_9BE3_4737_93A3_14DFC24827EC */

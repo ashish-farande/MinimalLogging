@@ -25,8 +25,4 @@ struct MetaDataWithDescriptors
     TypeDescriptors desciprtors;
 };
 
-
-
-
-
 #endif /* C73D5097_30ED_44E3_AEB0_4426E6452DFC */
