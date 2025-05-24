@@ -10,7 +10,9 @@
 #include <cstdio>
 #include <format>
 #include <typeinfo>
+#include <fmt/core.h>
 
+#include "meta_data/types.h"
 #include "meta_data/meta_data.h"
 #include "meta_data/meta_data_node.h"
 #include "meta_data/type_descriptors.h"
@@ -68,6 +70,10 @@ struct MetaDataSaver
             [&](CStr)
             {
                 file << "char* ";
+            },
+            [&](Bool)
+            {
+                file << "bool ";
             }};
 
         auto &temp = head_node();
@@ -115,7 +121,9 @@ struct MetaDataReader
             [](Float)
             { std::cout << "float "; },
             [](CStr)
-            { std::cout << "char* "; }};
+            { std::cout << "char* "; },
+            [](Bool)
+            { std::cout << "bool "; }};
 
         std::ifstream meta_data_file(file_name, std::ios::in | std::ios::binary);
 
@@ -177,6 +185,7 @@ struct MetaDataReader
     void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
         std::ifstream log_file(file_name, std::ios::in);
+        std::vector<LogDataTypes> types;
 
         const auto visitor = overloads{
             [&](Int)
@@ -184,17 +193,26 @@ struct MetaDataReader
                 int val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
                 std::cout << val << " ";
+                types.push_back(val);
             },
             [&](Float)
             {
                 float val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
                 std::cout << val << " ";
+                types.push_back(val);
             },
             [&](CStr)
             {
                 char *val;
                 log_file.read(reinterpret_cast<char *>(&val), 9);
+            },
+            [&](Bool)
+            {
+                bool val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                std::cout << val << " ";
+                types.push_back(val);
             }};
 
         if (!log_file.is_open())
@@ -212,17 +230,16 @@ struct MetaDataReader
             std::cout << id << " " << meta_data.at(id).macroData.file << " " << meta_data.at(id).macroData.function << " " << meta_data.at(id).macroData.line << "\n";
 
             std::cout << meta_data.at(id).macroData.fmt_str << " | ";
-
+            types.clear();
             for (const auto &desc : meta_data.at(id).desciprtors.buffer())
             {
                 std::visit(visitor, desc);
             }
             std::cout << "\n";
 
-            // FIXME: Format the read data
-            // int a = 1, b = 2;
-            // std::string formatted = std::vformat(meta_data.at(id).macroData.fmt_str, std::make_format_args(a, b));
-            // std::cout << formatted;
+            std::string formatted = format_with_variants(meta_data.at(id).macroData.fmt_str, types);
+            std::cout << formatted;
+            std::cout << "\n";
         }
 
         // FIXME: This is a temporary. Should be removed when the project is complete.

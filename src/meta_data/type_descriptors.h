@@ -10,7 +10,7 @@
 #include "meta_data/span.h"
 #include "meta_data/types.h"
 
-using TypeDescriptor = std::variant<Int, Float, CStr>;
+using TypeDescriptor = std::variant<Int, Float, CStr, Bool>;
 using TypeDescriptors = Span<TypeDescriptor>;
 
 template <typename T>
@@ -26,6 +26,12 @@ template <>
 struct GetTypeDescriptor<float>
 {
     static constexpr TypeDescriptor value{Float{}};
+};
+
+template <>
+struct GetTypeDescriptor<bool>
+{
+    static constexpr TypeDescriptor value{Bool{}};
 };
 
 template <>

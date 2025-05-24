@@ -9,7 +9,9 @@ void test_logger()
     LOG_WARN("This is an Warning2 {} {}", int(3), float(4.4));
 
     float a = 3.6f;
-    LOG_WARN("This is an Error {}", a);
+    LOG_WARN("This is a float {}", a);
+
+    LOG_WARN("This is a true statement {}", true);
 
     // FIXME: The size of the string needs to be stored in the file
     //     std::string s = "somestring";
