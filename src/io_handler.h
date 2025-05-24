@@ -23,12 +23,17 @@ const std::string READ_LOG_FILE_PATH{SOURCE_ROOT_DIR + "/output/log.dat"};
 // FIXME: This is a temporary file for human readable format. Should be removed when the project is complete.
 const std::string TMP_META_DATA_TXT_FILE_PATH{SOURCE_ROOT_DIR + "/output/metadata.txt"};
 
+template <class... Ts>
+struct overloads : Ts...
+{
+    using Ts::operator()...;
+};
+template <class... Ts>
+overloads(Ts...) -> overloads<Ts...>;
+
 template <typename T>
 void writeToFile(std::ofstream &file, const T &arg)
 {
-    std::cout << typeid(arg).name() << "\n";
-    std::cout << sizeof(decltype(arg)) << "\n";
-
     file.write(reinterpret_cast<const char *>(&arg), sizeof(decltype(arg)));
 }
 
@@ -51,6 +56,20 @@ struct MetaDataSaver
 
         std::ofstream file(TMP_META_DATA_TXT_FILE_PATH.c_str());
 
+        const auto print_and_save_name = overloads{
+            [&](Int)
+            {
+                file << "int ";
+            },
+            [&](Float)
+            {
+                file << "float ";
+            },
+            [&](CStr)
+            {
+                file << "char* ";
+            }};
+
         auto &temp = head_node();
         while (temp != nullptr)
         {
@@ -71,18 +90,7 @@ struct MetaDataSaver
             for (const auto &desc : temp->data->desciprtors)
             {
                 // TODO: Update this to all the data types
-                if (std::get_if<Int>(&desc))
-                {
-                    file << "int ";
-                }
-                else if (std::get_if<Float>(&desc))
-                {
-                    file << "float ";
-                }
-                else if (std::get_if<CStr>(&desc))
-                {
-                    file << "char* ";
-                }
+                std::visit(print_and_save_name, desc);
             }
             file << "\n";
             ///////////////////////////////////////////////////
@@ -101,10 +109,20 @@ struct MetaDataReader
 
     MetaDataReader(const std::string &file_name = META_DATA_DAT_FILE_PATH)
     {
+        const auto print_name = overloads{
+            [](Int)
+            { std::cout << "int "; },
+            [](Float)
+            { std::cout << "float "; },
+            [](CStr)
+            { std::cout << "char* "; }};
+
         std::ifstream meta_data_file(file_name, std::ios::in | std::ios::binary);
 
         if (!meta_data_file.is_open())
             return;
+
+        std::cout << "\nReading Metadata...\n";
 
         while (!meta_data_file.eof())
         {
@@ -112,8 +130,21 @@ struct MetaDataReader
             MetaData macro_data;
             std::size_t size;
             meta_data_file.read(reinterpret_cast<char *>(&id), sizeof(decltype(id)));
+
+            if (meta_data_file.eof())
+                break;
+
             meta_data_file.read(reinterpret_cast<char *>(&macro_data), sizeof(decltype(macro_data)));
+
+            if (meta_data_file.eof())
+                break;
+
             meta_data_file.read(reinterpret_cast<char *>(&size), sizeof(decltype(size)));
+
+            if (meta_data_file.eof())
+                break;
+
+            std::cout << id << " | " << (int)macro_data.level << " | " << macro_data.file << " | " << macro_data.line << " | " << macro_data.function << " | " << macro_data.fmt_str << " | ";
 
             std::vector<TypeDescriptor> tds(size);
             for (std::size_t i = 0; i < size; i++)
@@ -121,10 +152,23 @@ struct MetaDataReader
                 TypeDescriptor desc;
                 meta_data_file.read(reinterpret_cast<char *>(&desc), sizeof(decltype(desc)));
                 tds[i] = desc;
+                std::visit(print_name, desc);
             }
+            std::cout << "\n";
 
             meta_data.insert({id, MetaDataWithDescriptors{macro_data, Span{tds}}});
         }
+
+        // std::cout << "Printing the metadata...\n";
+        // for (const auto &[id, meta] : meta_data)
+        // {
+        //     std::cout << id << " | " << (int)meta.macroData.level << " | " << meta.macroData.file << " | " << meta.macroData.line << " | " << meta.macroData.function << " | " << meta.macroData.fmt_str << " | ";
+        //     for (const auto &desc : meta.desciprtors.buffer())
+        //     {
+        //         std::visit(print_name, desc);
+        //     }
+        //     std::cout << "\n";
+        // }
 
         std::cout << "Metadata size: " << meta_data.size() << "\n";
     }
@@ -133,6 +177,25 @@ struct MetaDataReader
     void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
         std::ifstream log_file(file_name, std::ios::in);
+
+        const auto visitor = overloads{
+            [&](Int)
+            {
+                int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                std::cout << val << " ";
+            },
+            [&](Float)
+            {
+                float val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                std::cout << val << " ";
+            },
+            [&](CStr)
+            {
+                char *val;
+                log_file.read(reinterpret_cast<char *>(&val), 9);
+            }};
 
         if (!log_file.is_open())
             return;
@@ -148,30 +211,11 @@ struct MetaDataReader
 
             std::cout << id << " " << meta_data.at(id).macroData.file << " " << meta_data.at(id).macroData.function << " " << meta_data.at(id).macroData.line << "\n";
 
-            std::cout << meta_data.at(id).macroData.fmt_str << "\n";
+            std::cout << meta_data.at(id).macroData.fmt_str << " | ";
 
-            for (std::size_t i = 0; i < meta_data.at(id).desciprtors.size(); i++)
+            for (const auto &desc : meta_data.at(id).desciprtors.buffer())
             {
-                TypeDescriptor desc = meta_data.at(id).desciprtors.at(i);
-                // TODO: Update this to all the data types
-                if (std::get_if<Int>(&desc))
-                {
-                    int val;
-                    log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                    std::cout << val << " ";
-                }
-                else if (std::get_if<Float>(&desc))
-                {
-                    float val;
-                    log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                    std::cout << val << " ";
-                }
-                else if (std::get_if<CStr>(&desc))
-                {
-                    char *val;
-                    log_file.read(reinterpret_cast<char *>(&val), 9);
-                    // s += std::to_string(val);
-                }
+                std::visit(visitor, desc);
             }
             std::cout << "\n";
 

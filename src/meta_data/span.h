@@ -3,7 +3,7 @@
 
 #include <array>
 #include <vector>
-
+// FIXME: This class a hacky fix for copying the vector.
 template <typename T>
 class Span
 {
@@ -13,19 +13,19 @@ public:
     constexpr Span(std::array<T, N> &arr) noexcept
         : data_(arr.data()), size_(N) {}
     constexpr Span(std::vector<T> &arr) noexcept
-        : data_(arr.data()), size_(arr.size()) {}
+        : buffer_(arr), data_(arr.data()), size_(arr.size()) {}
 
     template <std::size_t N>
     constexpr Span(const std::array<T, N> &arr) noexcept
         : data_(arr.data()), size_(N) {}
 
     constexpr Span(const std::vector<T> &arr) noexcept
-        : data_(arr.data()), size_(arr.size()) {}
+        : buffer_(arr), data_(arr.data()), size_(arr.size()) {}
 
     constexpr Span(const Span &arr) noexcept
-        : data_(arr.data_), size_(arr.size()) {}
+        : buffer_(arr.buffer_), data_(arr.data_), size_(arr.size()) {}
     constexpr Span(Span &arr) noexcept
-        : data_(arr.data_), size_(arr.size()) {}
+        : buffer_(arr.buffer_), data_(arr.data_), size_(arr.size()) {}
     // constexpr Span(const Span &&arr) noexcept
     //     : data_(arr.data_), size_(arr.size())
     // {
@@ -38,6 +38,10 @@ public:
     constexpr T *data() noexcept { return data_; }
     constexpr const T *data() const noexcept { return data_; }
     constexpr std::size_t size() const noexcept { return size_; }
+    const std::vector<T> buffer() const
+    {
+        return buffer_;
+    }
 
     // Indexing
     constexpr T &operator[](std::size_t index) { return data_[index]; }
@@ -51,8 +55,10 @@ public:
     constexpr const T *end() const noexcept { return data_ + size_; }
 
 private:
-    const T *data_;
-    std::size_t size_;
+    std::vector<T> buffer_;
+
+    const T *data_ = nullptr;
+    std::size_t size_ = 0;
 };
 
 #endif /* B150DCD8_00D0_43AE_9B07_41997CA65EC0 */

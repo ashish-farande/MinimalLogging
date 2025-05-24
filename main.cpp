@@ -5,10 +5,10 @@
 
 void test_logger()
 {
-    // LOG_WARN("This is an Warning {} {}", int(1), int(2));
-    // LOG_WARN("This is an Warning {} {}", int(3), int(4));
+    LOG_WARN("This is an Warning1 {} {}", int(1), int(2));
+    LOG_WARN("This is an Warning2 {} {}", int(3), float(4.4));
 
-    float a = 3.0f;
+    float a = 3.6f;
     LOG_WARN("This is an Error {}", a);
 
     // FIXME: The size of the string needs to be stored in the file
