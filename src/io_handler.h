@@ -11,6 +11,8 @@
 #include <format>
 #include <typeinfo>
 #include <fmt/core.h>
+#include <algorithm>
+#include <ranges>
 
 #include "meta_data/types.h"
 #include "meta_data/meta_data.h"
@@ -84,20 +86,15 @@ struct MetaDataSaver
             bin_file.write(reinterpret_cast<const char *>(&temp->data->macroData), sizeof(decltype(temp->data->macroData)));
             bin_file.write(reinterpret_cast<const char *>(&size), sizeof(decltype(size)));
 
-            for (const auto &desc : temp->data->desciprtors)
-            {
-                bin_file.write(reinterpret_cast<const char *>(&desc), sizeof(decltype(desc)));
-            }
+            std::ranges::for_each(temp->data->desciprtors, [&](const auto &desc)
+                                  { bin_file.write(reinterpret_cast<const char *>(&desc), sizeof(decltype(desc))); });
 
             // TODO: Remove when the implementation is done
             ///////////////////////////////////////////////////
             ++log_lines;
             file << temp->id << " | " << (int)temp->data->macroData.level << " | " << temp->data->macroData.file << " | " << temp->data->macroData.line << " | " << temp->data->macroData.function << " | " << temp->data->macroData.fmt_str << " | ";
-            for (const auto &desc : temp->data->desciprtors)
-            {
-                // TODO: Update this to all the data types
-                std::visit(print_and_save_name, desc);
-            }
+            std::ranges::for_each(temp->data->desciprtors, [&](const auto &desc)
+                                  { std::visit(print_and_save_name, desc); });
             file << "\n";
             ///////////////////////////////////////////////////
 
@@ -108,7 +105,6 @@ struct MetaDataSaver
     }
 };
 
-// TODO: Implement a reader
 struct MetaDataReader
 {
     std::unordered_map<int64_t, MetaDataWithDescriptors> meta_data;
@@ -171,17 +167,14 @@ struct MetaDataReader
         // for (const auto &[id, meta] : meta_data)
         // {
         //     std::cout << id << " | " << (int)meta.macroData.level << " | " << meta.macroData.file << " | " << meta.macroData.line << " | " << meta.macroData.function << " | " << meta.macroData.fmt_str << " | ";
-        //     for (const auto &desc : meta.desciprtors.buffer())
-        //     {
-        //         std::visit(print_name, desc);
-        //     }
+        //     std::ranges::for_each(meta.desciprtors.buffer(), [&](const auto &desc)
+        //                       { std::visit(print_name, desc); });
         //     std::cout << "\n";
         // }
 
         std::cout << "Metadata size: " << meta_data.size() << "\n";
     }
 
-    // FIXME: Reading of the log file is not working
     void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
         std::ifstream log_file(file_name, std::ios::in);
@@ -231,10 +224,10 @@ struct MetaDataReader
 
             std::cout << meta_data.at(id).macroData.fmt_str << " | ";
             types.clear();
-            for (const auto &desc : meta_data.at(id).desciprtors.buffer())
-            {
-                std::visit(visitor, desc);
-            }
+
+            std::ranges::for_each(meta_data.at(id).desciprtors.buffer(), [&](const auto &desc)
+                                  { std::visit(visitor, desc); });
+
             std::cout << "\n";
 
             std::string formatted = format_with_variants(meta_data.at(id).macroData.fmt_str, types);
@@ -242,7 +235,7 @@ struct MetaDataReader
             std::cout << "\n";
         }
 
-        // FIXME: This is a temporary. Should be removed when the project is complete.
+        // TODO: This is a temporary. Should be removed when the project is complete.
         // Attempt to delete the file
         if (std::remove(file_name.c_str()) == 0)
         {
