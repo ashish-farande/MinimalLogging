@@ -40,6 +40,12 @@ struct GetTypeDescriptor<const char *>
     static constexpr TypeDescriptor value{CStr{}};
 };
 
+template <>
+struct GetTypeDescriptor<std::string>
+{
+    static constexpr TypeDescriptor value{CStr{}};
+};
+
 #endif /* A2AE456B_683F_49D9_87F3_C98F503E0DAF */
 
 #endif /* AF1129B8_1BB3_4792_B59B_57DEC5152C58 */

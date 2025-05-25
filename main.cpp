@@ -15,8 +15,11 @@ void test_logger()
 
     // NOTE: We need to provide support to store datatypes in the file.
     // FIXME: Handling of string variables. The size of the string needs to be stored in the file
-    std::string s = "somestring";
-    LOG_INFO("This is a string {}", s.c_str());
+    const char *cstr = "somestring";
+    LOG_INFO("This is a char* {}", cstr);
+
+    std::string str = "some std::string";
+    LOG_INFO("This is a std::string {}", str);
 }
 
 int main()

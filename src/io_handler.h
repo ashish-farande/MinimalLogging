@@ -51,6 +51,16 @@ void writeToFile(std::ofstream &file, const char *arg)
     file.write(reinterpret_cast<const char *>(arg), size);
 }
 
+void writeToFile(std::ofstream &file, const std::string &arg)
+{
+    std::cout << "Writing CStr to file: " << arg << "\n";
+
+    // FIXME: Not the safest way to get the size of the string.
+    size_t size = arg.size();
+    file.write(reinterpret_cast<const char *>(&size), sizeof(decltype(size)));
+    file.write(reinterpret_cast<const char *>(arg.c_str()), size);
+}
+
 template <typename T, typename... Args>
 void writeToFile(std::ofstream &file, const T &arg, const Args &...args)
 {
