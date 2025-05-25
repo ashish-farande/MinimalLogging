@@ -3,7 +3,9 @@
 #include <thread>
 #include <chrono>
 
-#include "src/logger.h"
+#include "logger/logger.h"
+#include "log_reader/log_reader.h"
+#include "meta_data/io_handler.h"
 
 void test_logger()
 {
@@ -21,20 +23,24 @@ void test_logger()
     std::this_thread::sleep_for(std::chrono::seconds(3));
     std::string str = "some std::string";
     LOG_INFO("This is a std::string {}", str);
+
+    for (short int i = 0; i < 10; ++i)
+    {
+        LOG_INFO("This is a short int in loop {}", i);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 }
 
 int main()
 {
-
-    // Find a way to save this file before the main.
-    MetaDataSaver metadata_saver{};
+    meta_data::IOHandler{}.save();
 
     // The below print statement can provde that the metadata of all the logs are saved before the main function.
     std::cout << "Entering Main\n";
     test_logger();
 
-    // NOTE: This is log reader. IT can be seperate app of its own.
-    MetaDataReader{}.read();
+    // NOTE: This is log reader. It can be seperate app of its own.
+    LogReader{}.read();
 
     return 0;
 }

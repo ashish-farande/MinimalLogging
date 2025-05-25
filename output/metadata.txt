@@ -1,6 +1,7 @@
-6 | 2 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 23 | void test_logger() | This is a std::string {} | char* 
-5 | 2 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 19 | void test_logger() | This is a char* {} | char* 
-4 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 16 | void test_logger() | This is a true statement {} | bool 
-3 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 14 | void test_logger() | This is a float {} | float 
-2 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 11 | void test_logger() | This is an another example {} {} string after args | int float 
-1 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 10 | void test_logger() | This is an Warning1 {} {} | int int 
+7 | 2 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 29 | void test_logger() | This is a short int in loop {} | short int 
+6 | 2 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 25 | void test_logger() | This is a std::string {} | char* 
+5 | 2 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 21 | void test_logger() | This is a char* {} | char* 
+4 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 18 | void test_logger() | This is a true statement {} | bool 
+3 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 16 | void test_logger() | This is a float {} | float 
+2 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 13 | void test_logger() | This is an another example {} {} string after args | int float 
+1 | 1 | /Users/ashishfarande/Desktop/Projects/MyWork/MinimalLogging/main.cpp | 12 | void test_logger() | This is an Warning1 {} {} | int int 

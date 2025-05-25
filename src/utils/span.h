@@ -3,6 +3,7 @@
 
 #include <array>
 #include <vector>
+
 // FIXME: This class a hacky fix for copying the vector.
 template <typename T>
 class Span

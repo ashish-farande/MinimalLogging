@@ -5,36 +5,38 @@
 
 #include "meta_data/meta_data.h"
 
-struct MetaDataNode;
-
-MetaDataNode *&head_node()
+namespace meta_data
 {
-    static MetaDataNode *head{nullptr};
-    return head;
-}
+    struct MetaDataNode;
 
-struct MetaDataNode
-{
-    constexpr MetaDataNode(const MetaDataWithDescriptors *d) : id(gen_id()), data(d)
+    MetaDataNode *&head_node()
     {
-        auto &head = head_node();
-        next = std::exchange(head, this);
+        static MetaDataNode *head{nullptr};
+        return head;
     }
 
-    int64_t id;
-    const MetaDataWithDescriptors *data{nullptr};
-    MetaDataNode *next{nullptr};
-};
+    struct MetaDataNode
+    {
+        constexpr MetaDataNode(const MetaDataWithDescriptors *d) : id(gen_id()), data(d)
+        {
+            auto &head = head_node();
+            next = std::exchange(head, this);
+        }
 
-template <class MetaData_, class... Args>
-constexpr auto get_meta_data_ptr()
-{
-    static constexpr std::array type_descriptors{GetTypeDescriptor<Args>::value...};
-    static constexpr MetaDataWithDescriptors meta_data{MetaData_{}(), Span{type_descriptors}};
-    return &meta_data;
+        int64_t id;
+        const MetaDataWithDescriptors *data{nullptr};
+        MetaDataNode *next{nullptr};
+    };
+
+    template <class MetaData_, class... Args>
+    constexpr auto get_meta_data_ptr()
+    {
+        static constexpr std::array type_descriptors{GetTypeDescriptor<Args>::value...};
+        static constexpr MetaDataWithDescriptors meta_data{MetaData_{}(), Span{type_descriptors}};
+        return &meta_data;
+    }
+
+    template <class F, class... Args>
+    inline MetaDataNode meta_data_node{get_meta_data_ptr<F, Args...>()};
 }
-
-template <class F, class... Args>
-inline MetaDataNode meta_data_node{get_meta_data_ptr<F, Args...>()};
-
 #endif /* F1F261F2_B30E_4B19_83C7_A33467729E5F */

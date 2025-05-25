@@ -11,13 +11,28 @@
 
 #include "meta_data/types.h"
 
-enum class Level
+using LogDataTypes = std::variant<
+    int, float, double, long double, const char *,
+    bool, char, unsigned char,
+    short int, unsigned short int,
+    unsigned int,
+    long int, unsigned long int,
+    long long int, unsigned long long int, std::string>;
+
+const std::string SOURCE_ROOT_DIR{SOURCE_ROOT};
+const std::string META_DATA_DAT_FILE_PATH{SOURCE_ROOT_DIR + "/output/metadata.dat"};
+const std::string READ_LOG_FILE_PATH{SOURCE_ROOT_DIR + "/output/log.dat"};
+
+// FIXME: This is a temporary file for human readable format. Should be removed when the project is complete.
+const std::string TMP_META_DATA_TXT_FILE_PATH{SOURCE_ROOT_DIR + "/output/metadata.txt"};
+
+template <class... Ts>
+struct overloads : Ts...
 {
-    kError,
-    kWarn,
-    kInfo,
-    kDebug,
+    using Ts::operator()...;
 };
+template <class... Ts>
+overloads(Ts...) -> overloads<Ts...>;
 
 int64_t gen_id()
 {
