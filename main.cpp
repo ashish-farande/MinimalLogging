@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #include "src/logger.h"
 
 void test_logger()
 {
     LOG_WARN("This is an Warning1 {} {}", int(1), int(2));
-    LOG_WARN("This is an Warning2 {} {}", int(3), float(4.4));
+    LOG_WARN("This is an another example {} {} string after args", int(3), float(4.4));
 
     float a = 3.6f;
     LOG_WARN("This is a float {}", a);
@@ -16,6 +18,7 @@ void test_logger()
     const char *cstr = "somestring";
     LOG_INFO("This is a char* {}", cstr);
 
+    std::this_thread::sleep_for(std::chrono::seconds(3));
     std::string str = "some std::string";
     LOG_INFO("This is a std::string {}", str);
 }
@@ -31,7 +34,6 @@ int main()
     test_logger();
 
     // NOTE: This is log reader. IT can be seperate app of its own.
-    std::cout << "Reading Log File...\n";
     MetaDataReader{}.read();
 
     return 0;
