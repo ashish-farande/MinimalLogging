@@ -77,10 +77,59 @@ struct MetaDataSaver
         std::ofstream file(TMP_META_DATA_TXT_FILE_PATH.c_str());
 
         const auto print_and_save_name = overloads{
+            [&](Bool)
+            {
+                file << "bool ";
+            },
+            [&](Char)
+            {
+                file << "char ";
+            },
+            [&](UnsignedChar)
+            {
+                file << "unsigned char ";
+            },
+            [&](ShortInt)
+            {
+                file << "short int ";
+            },
+            [&](UnsignedShortInt)
+            {
+                file << "unsigned short int ";
+            },
             [&](Int)
             {
                 file << "int ";
             },
+            [&](UnsignedInt)
+            {
+                file << "unsigned int ";
+            },
+            [&](LongInt)
+            {
+                file << "long int ";
+            },
+            [&](UnsignedLongInt)
+            {
+                file << "unsigned long int ";
+            },
+            [&](LongLongInt)
+            {
+                file << "long long int ";
+            },
+            [&](UnsignedLongLongInt)
+            {
+                file << "unsigned long long int ";
+            },
+            [&](Double)
+            {
+                file << "double ";
+            },
+            [&](LongDouble)
+            {
+                file << "long double ";
+            },
+
             [&](Float)
             {
                 file << "float ";
@@ -89,10 +138,7 @@ struct MetaDataSaver
             {
                 file << "char* ";
             },
-            [&](Bool)
-            {
-                file << "bool ";
-            }};
+        };
 
         auto &temp = head_node();
         while (temp != nullptr)
@@ -128,15 +174,6 @@ struct MetaDataReader
 
     MetaDataReader(const std::string &file_name = META_DATA_DAT_FILE_PATH)
     {
-        const auto print_name = overloads{
-            [](Int)
-            { std::cout << "int "; },
-            [](Float)
-            { std::cout << "float "; },
-            [](CStr)
-            { std::cout << "char* "; },
-            [](Bool)
-            { std::cout << "bool "; }};
 
         std::ifstream meta_data_file(file_name, std::ios::in | std::ios::binary);
 
@@ -165,57 +202,136 @@ struct MetaDataReader
             if (meta_data_file.eof())
                 break;
 
-            std::cout << id << " | " << (int)macro_data.level << " | " << macro_data.file << " | " << macro_data.line << " | " << macro_data.function << " | " << macro_data.fmt_str << " | ";
-
             std::vector<TypeDescriptor> tds(size);
             for (std::size_t i = 0; i < size; i++)
             {
                 TypeDescriptor desc;
                 meta_data_file.read(reinterpret_cast<char *>(&desc), sizeof(decltype(desc)));
                 tds[i] = desc;
-                std::visit(print_name, desc);
             }
-            std::cout << "\n";
 
             meta_data.insert({id, MetaDataWithDescriptors{macro_data, Span{tds}}});
         }
 
         // std::cout << "Printing the metadata...\n";
+        // const auto print_name = overloads{
+        //     [](Int)
+        //     { std::cout << "int "; },
+        //     [](Float)
+        //     { std::cout << "float "; },
+        //     [](CStr)
+        //     { std::cout << "char* "; },
+        //     [](Bool)
+        //     { std::cout << "bool "; }};
         // for (const auto &[id, meta] : meta_data)
         // {
         //     std::cout << id << " | " << (int)meta.macroData.level << " | " << meta.macroData.file << " | " << meta.macroData.line << " | " << meta.macroData.function << " | " << meta.macroData.fmt_str << " | ";
         //     std::ranges::for_each(meta.desciprtors.buffer(), [&](const auto &desc)
-        //                       { std::visit(print_name, desc); });
+        //                           { std::visit(print_name, desc); });
         //     std::cout << "\n";
         // }
-
-        std::cout << "Metadata size: " << meta_data.size() << "\n";
+        // std::cout << "Metadata size: " << meta_data.size() << "\n";
     }
 
     void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
         std::cout << "\nLogs in the file...\n";
         std::ifstream log_file(file_name, std::ios::in);
-        std::vector<LogDataTypes> types;
 
+        if (!log_file.is_open())
+        {
+            std::cerr << "Error opening log file: " << file_name << std::endl;
+            return;
+        }
+
+        std::vector<LogDataTypes> types;
         const auto visitor = overloads{
+            [&](Bool)
+            {
+                bool val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](Char)
+            {
+                char val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](UnsignedChar)
+            {
+                unsigned char val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](ShortInt)
+            {
+                short int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](UnsignedShortInt)
+            {
+                unsigned short int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
             [&](Int)
             {
                 int val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                // std::cout << val << " ";
+                types.push_back(val);
+            },
+            [&](UnsignedInt)
+            {
+                unsigned int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](LongInt)
+            {
+                long int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](UnsignedLongInt)
+            {
+                unsigned long int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](LongLongInt)
+            {
+                long long int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](UnsignedLongLongInt)
+            {
+                unsigned long long int val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](Double)
+            {
+                double val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
+                types.push_back(val);
+            },
+            [&](LongDouble)
+            {
+                long double val;
+                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
                 types.push_back(val);
             },
             [&](Float)
             {
                 float val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                // std::cout << val << " ";
                 types.push_back(val);
             },
             [&](CStr)
             {
-                // char *val;
                 size_t size;
                 log_file.read(reinterpret_cast<char *>(&size), sizeof(decltype(size)));
                 char *cstr = new char[size + 1];
@@ -223,18 +339,8 @@ struct MetaDataReader
                 log_file.read(reinterpret_cast<char *>(cstr), size);
                 std::string val(cstr);
                 types.push_back(val);
-                // std::cout << val << " ";
             },
-            [&](Bool)
-            {
-                bool val;
-                log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                // std::cout << val << " ";
-                types.push_back(val);
-            }};
-
-        if (!log_file.is_open())
-            return;
+        };
 
         while (!log_file.eof())
         {
@@ -266,14 +372,14 @@ struct MetaDataReader
 
         // TODO: This is a temporary. Should be removed when the project is complete.
         // Attempt to delete the file
-        if (std::remove(file_name.c_str()) == 0)
-        {
-            std::cout << "File '" << file_name << "' deleted successfully." << std::endl;
-        }
-        else
-        {
-            std::cerr << "Error deleting file '" << file_name << "'." << std::endl;
-        }
+        // if (std::remove(file_name.c_str()) == 0)
+        // {
+        //     std::cout << "File '" << file_name << "' deleted successfully." << std::endl;
+        // }
+        // else
+        // {
+        //     std::cerr << "Error deleting file '" << file_name << "'." << std::endl;
+        // }
     }
 };
 

@@ -10,11 +10,43 @@
 #include "meta_data/span.h"
 #include "meta_data/types.h"
 
-using TypeDescriptor = std::variant<Int, Float, CStr, Bool>;
+using TypeDescriptor = std::variant<Bool, Char, UnsignedChar, ShortInt, UnsignedShortInt, Int,
+                                    UnsignedInt, LongInt, UnsignedLongInt, LongLongInt, UnsignedLongLongInt,
+                                    Double, LongDouble, Float, CStr>;
 using TypeDescriptors = Span<TypeDescriptor>;
 
 template <typename T>
 struct GetTypeDescriptor;
+
+template <>
+struct GetTypeDescriptor<bool>
+{
+    static constexpr TypeDescriptor value{Bool{}};
+};
+
+template <>
+struct GetTypeDescriptor<char>
+{
+    static constexpr TypeDescriptor value{Char{}};
+};
+
+template <>
+struct GetTypeDescriptor<unsigned char>
+{
+    static constexpr TypeDescriptor value{UnsignedChar{}};
+};
+
+template <>
+struct GetTypeDescriptor<short int>
+{
+    static constexpr TypeDescriptor value{ShortInt{}};
+};
+
+template <>
+struct GetTypeDescriptor<unsigned short int>
+{
+    static constexpr TypeDescriptor value{UnsignedShortInt{}};
+};
 
 template <>
 struct GetTypeDescriptor<int>
@@ -23,15 +55,51 @@ struct GetTypeDescriptor<int>
 };
 
 template <>
-struct GetTypeDescriptor<float>
+struct GetTypeDescriptor<unsigned int>
 {
-    static constexpr TypeDescriptor value{Float{}};
+    static constexpr TypeDescriptor value{UnsignedInt{}};
 };
 
 template <>
-struct GetTypeDescriptor<bool>
+struct GetTypeDescriptor<long int>
 {
-    static constexpr TypeDescriptor value{Bool{}};
+    static constexpr TypeDescriptor value{LongInt{}};
+};
+
+template <>
+struct GetTypeDescriptor<unsigned long int>
+{
+    static constexpr TypeDescriptor value{UnsignedLongInt{}};
+};
+
+template <>
+struct GetTypeDescriptor<long long int>
+{
+    static constexpr TypeDescriptor value{LongLongInt{}};
+};
+
+template <>
+struct GetTypeDescriptor<unsigned long long int>
+{
+    static constexpr TypeDescriptor value{UnsignedLongLongInt{}};
+};
+
+template <>
+struct GetTypeDescriptor<double>
+{
+    static constexpr TypeDescriptor value{Double{}};
+};
+
+template <>
+struct GetTypeDescriptor<long double>
+{
+    static constexpr TypeDescriptor value{LongDouble{}};
+};
+
+template <>
+struct GetTypeDescriptor<float>
+{
+    static constexpr TypeDescriptor value{Float{}};
 };
 
 template <>
