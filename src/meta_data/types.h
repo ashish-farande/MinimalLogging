@@ -9,7 +9,7 @@ using LogDataTypes = std::variant<
     short int, unsigned short int,
     unsigned int,
     long int, unsigned long int,
-    long long int, unsigned long long int>;
+    long long int, unsigned long long int, std::string>;
 
 struct Bool
 {

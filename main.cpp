@@ -13,9 +13,10 @@ void test_logger()
 
     LOG_WARN("This is a true statement {}", true);
 
-    // FIXME: The size of the string needs to be stored in the file
-    //     std::string s = "somestring";
-    //     LOG_INFO("This is a string {{}}", s.c_str());
+    // NOTE: We need to provide support to store datatypes in the file.
+    // FIXME: Handling of string variables. The size of the string needs to be stored in the file
+    std::string s = "somestring";
+    LOG_INFO("This is a string {}", s.c_str());
 }
 
 int main()

@@ -41,6 +41,16 @@ void writeToFile(std::ofstream &file, const T &arg)
     file.write(reinterpret_cast<const char *>(&arg), sizeof(decltype(arg)));
 }
 
+void writeToFile(std::ofstream &file, const char *arg)
+{
+    std::cout << "Writing CStr to file: " << arg << "\n";
+
+    // FIXME: Not the safest way to get the size of the string.
+    size_t size = strlen(arg);
+    file.write(reinterpret_cast<const char *>(&size), sizeof(decltype(size)));
+    file.write(reinterpret_cast<const char *>(arg), size);
+}
+
 template <typename T, typename... Args>
 void writeToFile(std::ofstream &file, const T &arg, const Args &...args)
 {
@@ -197,8 +207,15 @@ struct MetaDataReader
             },
             [&](CStr)
             {
-                char *val;
-                log_file.read(reinterpret_cast<char *>(&val), 9);
+                // char *val;
+                size_t size;
+                log_file.read(reinterpret_cast<char *>(&size), sizeof(decltype(size)));
+                char *cstr = new char[size + 1];
+                memset(cstr, 0, size + 1);
+                log_file.read(reinterpret_cast<char *>(cstr), size);
+                std::string val(cstr);
+                types.push_back(val);
+                std::cout << val << " ";
             },
             [&](Bool)
             {
