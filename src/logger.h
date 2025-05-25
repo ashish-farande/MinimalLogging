@@ -3,6 +3,7 @@
 
 #include <string_view>
 #include <source_location>
+#include <chrono>
 
 #include "meta_data/meta_data_node.h"
 #include "meta_data/meta_data.h"
@@ -33,6 +34,9 @@ void log(Args const &...args)
 {
     // TODO: Writing to the file should be handled using RingBuffers
     std::ofstream file_out(READ_LOG_FILE_PATH.c_str(), std::ios::app | std::ios::binary);
+
+    std::time_t cur_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    file_out.write(reinterpret_cast<char const *>(&cur_time), sizeof(cur_time));
     file_out.write(reinterpret_cast<const char *>(&meta_data_node<F, Args...>.id), sizeof(decltype(meta_data_node<F, Args...>.id)));
     writeToFile(file_out, args...);
     file_out.close();

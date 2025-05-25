@@ -13,6 +13,7 @@
 #include <fmt/core.h>
 #include <algorithm>
 #include <ranges>
+#include <chrono>
 
 #include "meta_data/types.h"
 #include "meta_data/meta_data.h"
@@ -193,6 +194,7 @@ struct MetaDataReader
 
     void read(const std::string &file_name = READ_LOG_FILE_PATH)
     {
+        std::cout << "\nLogs in the file...\n";
         std::ifstream log_file(file_name, std::ios::in);
         std::vector<LogDataTypes> types;
 
@@ -238,12 +240,15 @@ struct MetaDataReader
         {
             std::cout << "\n";
             int64_t id = 0;
+
+            std::time_t time_t_value;
+            log_file.read(reinterpret_cast<char *>(&time_t_value), sizeof(decltype(time_t_value)));
             log_file.read(reinterpret_cast<char *>(&id), sizeof(decltype(id)));
 
             if (meta_data.find(id) == meta_data.end())
                 continue;
 
-            std::cout << id << " " << meta_data.at(id).macroData.file << " " << meta_data.at(id).macroData.function << " " << meta_data.at(id).macroData.line << "\n";
+            std::cout << std::chrono::system_clock::from_time_t(time_t_value) << " " << id << " " << meta_data.at(id).macroData.file << " " << meta_data.at(id).macroData.function << " " << meta_data.at(id).macroData.line << " ";
 
             // std::cout << meta_data.at(id).macroData.fmt_str << " | ";
             types.clear();
@@ -255,8 +260,9 @@ struct MetaDataReader
 
             std::string formatted = format_with_variants(meta_data.at(id).macroData.fmt_str, types);
             std::cout << formatted;
-            std::cout << "\n";
+            // std::cout << "\n";
         }
+        std::cout << std::endl;
 
         // TODO: This is a temporary. Should be removed when the project is complete.
         // Attempt to delete the file
