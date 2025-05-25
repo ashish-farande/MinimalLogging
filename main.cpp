@@ -13,8 +13,6 @@ void test_logger()
 
     LOG_WARN("This is a true statement {}", true);
 
-    // NOTE: We need to provide support to store datatypes in the file.
-    // FIXME: Handling of string variables. The size of the string needs to be stored in the file
     const char *cstr = "somestring";
     LOG_INFO("This is a char* {}", cstr);
 
@@ -28,11 +26,13 @@ int main()
     // Find a way to save this file before the main.
     MetaDataSaver metadata_saver{};
 
+    // The below print statement can provde that the metadata of all the logs are saved before the main function.
     std::cout << "Entering Main\n";
     test_logger();
 
+    // NOTE: This is log reader. IT can be seperate app of its own.
     std::cout << "Reading Log File...\n";
-    MetaDataReader metadata_reader{};
-    metadata_reader.read();
+    MetaDataReader{}.read();
+
     return 0;
 }

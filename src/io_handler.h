@@ -117,6 +117,7 @@ struct MetaDataSaver
         }
 
         std::cout << log_lines << " log lines were located in source code.\n";
+        std::cout << "Metadata saved to file.\n\n";
     }
 };
 
