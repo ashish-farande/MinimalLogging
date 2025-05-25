@@ -43,8 +43,6 @@ void writeToFile(std::ofstream &file, const T &arg)
 
 void writeToFile(std::ofstream &file, const char *arg)
 {
-    std::cout << "Writing CStr to file: " << arg << "\n";
-
     // FIXME: Not the safest way to get the size of the string.
     size_t size = strlen(arg);
     file.write(reinterpret_cast<const char *>(&size), sizeof(decltype(size)));
@@ -53,9 +51,6 @@ void writeToFile(std::ofstream &file, const char *arg)
 
 void writeToFile(std::ofstream &file, const std::string &arg)
 {
-    std::cout << "Writing CStr to file: " << arg << "\n";
-
-    // FIXME: Not the safest way to get the size of the string.
     size_t size = arg.size();
     file.write(reinterpret_cast<const char *>(&size), sizeof(decltype(size)));
     file.write(reinterpret_cast<const char *>(arg.c_str()), size);
@@ -205,14 +200,14 @@ struct MetaDataReader
             {
                 int val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                std::cout << val << " ";
+                // std::cout << val << " ";
                 types.push_back(val);
             },
             [&](Float)
             {
                 float val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                std::cout << val << " ";
+                // std::cout << val << " ";
                 types.push_back(val);
             },
             [&](CStr)
@@ -225,13 +220,13 @@ struct MetaDataReader
                 log_file.read(reinterpret_cast<char *>(cstr), size);
                 std::string val(cstr);
                 types.push_back(val);
-                std::cout << val << " ";
+                // std::cout << val << " ";
             },
             [&](Bool)
             {
                 bool val;
                 log_file.read(reinterpret_cast<char *>(&val), sizeof(decltype(val)));
-                std::cout << val << " ";
+                // std::cout << val << " ";
                 types.push_back(val);
             }};
 
@@ -249,13 +244,13 @@ struct MetaDataReader
 
             std::cout << id << " " << meta_data.at(id).macroData.file << " " << meta_data.at(id).macroData.function << " " << meta_data.at(id).macroData.line << "\n";
 
-            std::cout << meta_data.at(id).macroData.fmt_str << " | ";
+            // std::cout << meta_data.at(id).macroData.fmt_str << " | ";
             types.clear();
 
             std::ranges::for_each(meta_data.at(id).desciprtors.buffer(), [&](const auto &desc)
                                   { std::visit(visitor, desc); });
 
-            std::cout << "\n";
+            // std::cout << "\n";
 
             std::string formatted = format_with_variants(meta_data.at(id).macroData.fmt_str, types);
             std::cout << formatted;
